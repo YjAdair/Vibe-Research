@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { TrendingUp, FileText, Newspaper, Rss, RefreshCw, Loader2, ExternalLink, AlertCircle, Sparkles, Lightbulb, Star } from "lucide-react";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { TrendingUp, FileText, Newspaper, Rss, Flame, RefreshCw, Loader2, ExternalLink, AlertCircle, Sparkles, Lightbulb, Star } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -10,6 +10,8 @@ import { GlassCard } from "@/components/ui/GlassCard";
 import { Disclaimer } from "@/components/ui/Disclaimer";
 import { SaveNoteButton } from "@/components/ui/SaveNoteButton";
 import { api, ApiError, type RadarData, type Industry, type Announcement, type NewsItem, type MacroProbability, type MacroProbItem } from "@/lib/api";
+import { HOT_MODULES, hotHref, type HotView } from "@/lib/hotModules";
+import { ThemeRotation } from "@/pages/ThemeRotation";
 import { displayedHeadlineTranslation, hasChinese, headlineNeedsTranslation, loadHeadlineTranslationCache, saveHeadlineTranslationCache, splitHeadlineBatches } from "@/lib/headlineTranslation";
 import { loadWatch } from "@/lib/watchlist";
 import { hasLlm, chatStream, translateHeadlineBatch } from "@/lib/llm";
@@ -17,6 +19,7 @@ import { cn } from "@/lib/utils";
 
 // 顺序即侧栏子栏目顺序（Layout 的 INTEL_LINKS 与此一致）
 const TABS = [
+  { key: "hot", label: "热点", icon: Flame, integrated: true, desc: "题材轮动、题材表格、我的题材、每日盘前、每日盘后。这一版只做题材轮动界面。" },
   { key: "investment-news", label: "Investment News", icon: Rss, integrated: true, desc: "12 赛道全球公开 RSS 资讯（集成自 investment-news 仓库）" },
   { key: "news", label: "公开新闻", icon: Newspaper, integrated: false, desc: "汇总关注列表里各个股的近期新闻（公开源）" },
   { key: "filings", label: "A股公告", icon: FileText, integrated: false, desc: "汇总关注列表里各个股的近期公告（东财公开披露）" },
@@ -44,7 +47,7 @@ function InvestmentNewsPanel() {
   // 打开先给存档、后台再刷（见 core/data/useArchiveThenRefresh）——
   // 抓一轮资讯要好几十秒，让人对着转圈等是最没必要的那种等待。
   const { data, err, loading, refreshing, staleNote, refresh } =
-    useArchiveThenRefresh<RadarData>((r) => (r ? api.radarRefresh() : api.radar()), []);
+    useArchiveThenRefresh<RadarData>((r) => (r ? api.radarRefresh() : api.radar()), [], "intel:investment-news");
 
   const industries: Industry[] = data?.industries || [];
   const cur = industries.find((i) => i.key === active) || industries[0];
@@ -362,7 +365,7 @@ function WatchlistFeed({ kind }: { kind: "filings" | "news" }) {
   }, [kind, codes]);
 
   const { data, err, loading, refreshing, staleNote, refresh: rerun } =
-    useArchiveThenRefresh<FeedRow[]>(load, [kind, codes.join(",")]);
+    useArchiveThenRefresh<FeedRow[]>(load, [kind, codes.join(",")], `intel:${kind}`);
   const rows = data ?? [];
 
   // 刷新时顺便把关注列表重新读一遍（用户可能刚在别的页面加了自选）
@@ -431,12 +434,47 @@ function WatchlistFeed({ kind }: { kind: "filings" | "news" }) {
   );
 }
 
+function HotSection({ view }: { view: HotView }) {
+  const mod = HOT_MODULES.find((m) => m.view === view) ?? HOT_MODULES[0];
+  return (
+    <div>
+      <div className="mb-3 flex flex-wrap gap-1.5">
+        {HOT_MODULES.map((m) => (
+          <Link key={m.view} to={hotHref(m.view)}
+            className={cn("rounded-md px-2.5 py-1 text-xs", m.view === mod.view ? "bg-primary/15 font-medium text-primary" : "text-muted-foreground hover:bg-muted/50")}>
+            {m.label}
+          </Link>
+        ))}
+      </div>
+      {mod.view === "rotation" ? <ThemeRotation /> : (
+        <p className="py-8 text-sm text-muted-foreground">{mod.label}这一版未做。当前只复刻题材轮动界面。</p>
+      )}
+    </div>
+  );
+}
+
 export function Intel() {
-  // 当前 Tab 由路由驱动（/intel/:tab），与侧栏子栏目联动；不认识的参数回落到第一个
+  // 当前 Tab 由路由驱动（/intel/:tab），与侧栏子栏目联动；不认识的参数回到热点
   const { tab: tabParam } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  const tab = TABS.some((t) => t.key === tabParam) ? tabParam! : TABS[0]!.key;
+  const known = TABS.some((t) => t.key === tabParam);
+  useEffect(() => {
+    if (!known) navigate("/intel/hot", { replace: true });
+  }, [known, navigate]);
+  const tab = known ? tabParam! : "hot";
+  const viewParam = searchParams.get("view");
+  const hotView: HotView = HOT_MODULES.some((m) => m.view === viewParam) ? viewParam as HotView : "rotation";
+  useEffect(() => {
+    if (tab === "hot" && viewParam !== hotView) setSearchParams({ view: hotView }, { replace: true });
+  }, [tab, viewParam, hotView, setSearchParams]);
   const cur = TABS.find((t) => t.key === tab)!;
+  // 看过的栏目留在树上。切走只是隐藏，不再卸掉后重取。
+  const [visited, setVisited] = useState<string[]>([]);
+  useEffect(() => {
+    if (!known) return;
+    setVisited((v) => (v.includes(tab) ? v : [...v, tab]));
+  }, [known, tab]);
 
   useAiPage({
     key: `intel:${tab}`,
@@ -467,20 +505,16 @@ export function Intel() {
           {/* ⚠️ 徽章上印的是**源名**,不是"已接入" —— 别的 tab 接入了别的源,不能共用这一个标签 */}
           {cur.key === "investment-news" && <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] text-primary">investment-news</span>}
         </div>
-        {cur.key === "investment-news" ? (
-          <InvestmentNewsPanel />
-        ) : cur.key === "filings" ? (
-          <WatchlistFeed kind="filings" />
-        ) : cur.key === "news" ? (
-          <WatchlistFeed kind="news" />
-        ) : cur.key === "events" ? (
-          <EventsPanel />
-        ) : (
-          <>
-            <p className="text-sm text-muted-foreground">{cur.desc}</p>
-            <div className="mt-4 rounded-lg border border-dashed border-border/70 p-8 text-center text-sm text-muted-foreground/70">该数据源规划中——可先用右侧「Investment News」看 12 赛道公开资讯，或用「A 股公告 / 公开新闻」看关注股动态。</div>
-          </>
-        )}
+        {visited.map((key) => (
+          <div key={key} hidden={key !== tab}>
+            {key === "hot" ? <HotSection view={hotView} />
+              : key === "investment-news" ? <InvestmentNewsPanel />
+              : key === "filings" ? <WatchlistFeed kind="filings" />
+              : key === "news" ? <WatchlistFeed kind="news" />
+              : key === "events" ? <EventsPanel />
+              : null}
+          </div>
+        ))}
       </GlassCard>
 
       <p className="mt-3 text-[11px] text-muted-foreground/60">
@@ -501,7 +535,7 @@ export function Intel() {
  */
 function EventsPanel() {
   const { data, err, loading, refreshing, staleNote, refresh } =
-    useArchiveThenRefresh<MacroProbability>((r) => api.macroProbability(r), []);
+    useArchiveThenRefresh<MacroProbability>((r) => api.macroProbability(r), [], "intel:events");
 
   if (loading) return <p className="mt-4 text-sm text-muted-foreground">正在取…（这一页还没有存档）</p>;
   if (err) return <p className="mt-4 text-sm text-destructive">{err}</p>;

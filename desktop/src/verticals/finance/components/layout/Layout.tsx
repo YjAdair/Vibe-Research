@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, Outlet, useLocation, useNavigation } from "react-router-dom";
 import {
-  Activity, ChevronDown, ChevronsLeft, ChevronsRight, Cog, Cpu, FileText, FlaskConical, Gauge, Github, Globe, Home, LayoutGrid, Microscope, Menu, X, Moon, Newspaper, NotebookPen, Radar, Rss, Settings, Star, Sun, Swords, Thermometer, TrendingUp, UserRound, Wallet,
+  Activity, ChevronDown, ChevronsLeft, ChevronsRight, Cog, Cpu, FileText, Flame, FlaskConical, Gauge, Github, Globe, Home, LayoutGrid, Microscope, Menu, X, Moon, Newspaper, NotebookPen, Radar, Rss, Settings, Star, Sun, Swords, Thermometer, TrendingUp, UserRound, Wallet,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PhoenixTreeLogo } from "@/components/ui/PhoenixTreeLogo";
@@ -9,6 +9,7 @@ import { AiPageProvider } from "../../../../core/ai/pageContext";
 import { FinanceAiDock } from "@/components/ui/FinanceAiDock";
 import { useDarkMode } from "@/hooks/useDarkMode";
 import { storageGet, storageSet } from "@/lib/storage";
+import { HOT_MODULES } from "@/lib/hotModules";
 import { useAiRuntime } from "@/hooks/useAiRuntime";
 import { aiConnectionLabel } from "@/lib/aiConnection";
 import { AgentToggle } from "@/components/ui/AgentToggle";
@@ -33,8 +34,11 @@ const NAV = [
   { to: "/settings", icon: Settings, label: "接入 AI" },
 ];
 
+type SideLink = { to: string; icon: typeof Flame; label: string; views?: readonly { view: string; label: string }[] };
+
 // 资讯雷达的小栏目（缩进子项，顺序即页内 Tab 顺序）。
-const INTEL_LINKS = [
+const INTEL_LINKS: SideLink[] = [
+  { to: "/intel/hot", icon: Flame, label: "热点", views: HOT_MODULES },
   { to: "/intel/investment-news", icon: Rss, label: "Investment News" },
   { to: "/intel/news", icon: Newspaper, label: "公开新闻" },
   { to: "/intel/filings", icon: FileText, label: "A股公告" },
@@ -59,14 +63,14 @@ const SECTOR_LINKS = [
 // 🔴 存储键**带版本号**：默认值从"展开"改成"收起"时，老键里存着的 "open"
 //    会让已经用过的人照旧全展开 —— 那不是 bug（它在记住你的选择），但新默认就等于没生效。
 //    换个键 = 旧记忆不再适用，所有人重新从收起开始；之后手动展开的仍然会被记住。
-const NAV_GROUPS: Record<string, { storageKey: string; links: typeof SIGNAL_LINKS }> = {
+const NAV_GROUPS: Record<string, { storageKey: string; links: readonly SideLink[] }> = {
   "/intel": { storageKey: "vr-intel-open2", links: INTEL_LINKS },
   "/signals": { storageKey: "vr-signals-open2", links: SIGNAL_LINKS },
   "/sectors": { storageKey: "vr-sectors-open2", links: SECTOR_LINKS },
 };
 
 export function Layout() {
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
   const navigation = useNavigation();
   const aiRuntime = useAiRuntime();
   const { dark, toggle } = useDarkMode();
@@ -142,7 +146,11 @@ export function Layout() {
     return () => document.removeEventListener("keydown", keyboard);
   }, [mobile, mobileOpen]);
   const compact = collapsed && !mobile;
-  const currentTitle = NAV.find(n => n.to === pathname)?.label
+  const hotLabel = pathname === "/intel/hot"
+    ? (HOT_MODULES.find(m => search === `?view=${m.view}`)?.label ?? "题材轮动")
+    : undefined;
+  const currentTitle = hotLabel
+    ?? NAV.find(n => n.to === pathname)?.label
     ?? Object.values(NAV_GROUPS).flatMap(g => g.links).find(n => n.to === pathname)?.label
     ?? "工作空间";
 
@@ -181,6 +189,7 @@ export function Layout() {
               const active = pathname === to;
               const group = NAV_GROUPS[to];
               const groupOpen = group ? !!openGroups[to] : false;
+              const showGroup = groupOpen || compact || (to === "/intel" && pathname === "/intel/hot");
               return <div key={to}>
                 <div className="flex items-center">
                   <Link to={to} aria-label={label} aria-current={active ? "page" : undefined} title={compact ? label : undefined}
@@ -196,14 +205,25 @@ export function Layout() {
                     <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", !groupOpen && "-rotate-90")} />
                   </button>}
                 </div>
-                {group && (groupOpen || compact) && <div className={cn("mt-1 space-y-0.5", !compact && "ml-5 border-l border-border pl-2")}>
-                  {group.links.map(({ to: st, icon: SIcon, label: slabel }) => <Link key={st} to={st}
-                    aria-label={slabel} title={compact ? slabel : undefined} aria-current={pathname === st ? "page" : undefined}
-                    onClick={() => { if (mobile) { setMobileOpen(false); requestAnimationFrame(() => mainRef.current?.focus()); } }}
-                    className={cn("workspace-nav-link flex items-center text-xs text-muted-foreground hover:bg-muted/40 hover:text-foreground",
-                      compact ? "justify-center p-2" : "gap-2 px-2 py-1.5")}>
-                    <SIcon className="h-3.5 w-3.5 shrink-0" />{!compact && slabel}
-                  </Link>)}
+                {group && showGroup && <div className={cn("mt-1 space-y-0.5", !compact && "ml-5 border-l border-border pl-2")}>
+                  {group.links.map(({ to: st, icon: SIcon, label: slabel, views }) => <div key={st}>
+                    <Link to={st}
+                      aria-label={slabel} title={compact ? slabel : undefined} aria-current={pathname === st ? "page" : undefined}
+                      onClick={() => { if (mobile) { setMobileOpen(false); requestAnimationFrame(() => mainRef.current?.focus()); } }}
+                      className={cn("workspace-nav-link flex items-center text-xs text-muted-foreground hover:bg-muted/40 hover:text-foreground",
+                        compact ? "justify-center p-2" : "gap-2 px-2 py-1.5")}>
+                      <SIcon className="h-3.5 w-3.5 shrink-0" />{!compact && slabel}
+                    </Link>
+                    {views && !compact && <div className="ml-4 space-y-0.5 border-l border-border pl-2">
+                      {views.map((v) => {
+                        const on = pathname === st && (search === `?view=${v.view}` || (v.view === "rotation" && search === ""));
+                        return <Link key={v.view} to={`${st}?view=${v.view}`} aria-current={on ? "page" : undefined}
+                          onClick={() => { if (mobile) { setMobileOpen(false); requestAnimationFrame(() => mainRef.current?.focus()); } }}
+                          className={cn("block rounded px-2 py-1 text-[11px] hover:bg-muted/40 hover:text-foreground",
+                            on ? "font-medium text-primary" : "text-muted-foreground")}>{v.label}</Link>;
+                      })}
+                    </div>}
+                  </div>)}
                 </div>}
               </div>;
             })}

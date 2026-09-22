@@ -49,6 +49,8 @@ const SAFE_AGENT_MESSAGE_CODES = new Set([
   "ai_not_configured", "agent_required", "agent_runtime_unsupported", "direct_provider_unsupported", "bad_execution_mode",
   "network_error", "http_error", "bad_json", "upstream_error", "empty_choice",
   "confirmation_expired", "source_changed",
+  "content_mismatch", "unsupported_type", "file_too_large", "batch_too_large", "bad_content",
+  "too_many_files", "no_files", "unknown_kind", "body_too_large", "ingest_turn_failed",
 ]);
 
 /**
@@ -251,8 +253,12 @@ async function ensureSelectedLocalAgentReady(llm: unknown, signal?: AbortSignal)
 }
 
 export const backend = {
-  importPositions: (files: { name: string; content_base64: string }[], signal?: AbortSignal) => {
+  importPositions: async (files: { name: string; content_base64: string }[], signal?: AbortSignal) => {
     const runtime = requestRuntime();
+    if (runtime.executionMode !== "agent") {
+      throw new ApiError("资料转写需要 Agent 读取文件，请先开启 Vibe Research Agent", 409, "agent_required");
+    }
+    await ensureSelectedLocalAgentReady(runtime.llm, signal);
     return call<ImportResult>("/import", { method: "POST", signal,
       body: JSON.stringify({ kind: "position", files, llm: runtime.llm, executionMode: runtime.executionMode }) });
   },
