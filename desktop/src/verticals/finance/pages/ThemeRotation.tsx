@@ -583,7 +583,7 @@ function ModePanel({
   }
 
   if (mode === "kline") {
-    return <KlinePane plateCode={plateCode} subCode={subCode} />;
+    return <KlinePane plateCode={plateCode} subCode={subCode} asOf={dates[0]} />;
   }
 
   const latestDay = dates[0];
@@ -1304,45 +1304,257 @@ function PctDay({
   );
 }
 
-function KlinePane({ plateCode, subCode }: { plateCode: string; subCode: string | null }) {
+type KlineRow = {
+  date: string;
+  open: number | null;
+  close: number | null;
+  high: number | null;
+  low: number | null;
+  volume: number | null;
+  amount: number | null;
+};
+
+function isoDay(v: unknown): string {
+  const s = String(v || "");
+  if (/^\d{8}$/.test(s)) return `${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)}`;
+  return s.slice(0, 10);
+}
+
+function finite(v: unknown): number | null {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+
+function maSeries(values: (number | null)[], n: number): (number | null)[] {
+  return values.map((_, i) => {
+    if (i < n - 1) return null;
+    let sum = 0;
+    for (let j = i - n + 1; j <= i; j++) {
+      const v = values[j];
+      if (v == null) return null;
+      sum += v;
+    }
+    return sum / n;
+  });
+}
+
+function normalizeKlinePayload(raw: unknown): { rows: KlineRow[]; meta: Record<string, unknown> } {
+  const source = (raw && typeof raw === "object" ? raw : {}) as Record<string, unknown>;
+  const xs = Array.isArray(source.x) ? source.x : [];
+  const ys = Array.isArray(source.y) ? source.y : [];
+  const vols = Array.isArray(source.vol) ? source.vol : [];
+  const amounts = Array.isArray(source.amount)
+    ? source.amount
+    : Array.isArray(source.turnover) ? source.turnover : [];
+  const rows: KlineRow[] = [];
+  for (let i = 0; i < xs.length; i++) {
+    const y = Array.isArray(ys[i]) ? ys[i] as unknown[] : [];
+    rows.push({
+      date: isoDay(xs[i]),
+      open: finite(y[0]),
+      close: finite(y[1]),
+      high: finite(y[2]),
+      low: finite(y[3]),
+      volume: finite(vols[i]),
+      amount: finite(amounts[i]),
+    });
+  }
+  rows.sort((a, b) => a.date.localeCompare(b.date));
+  return { rows, meta: source };
+}
+
+function KlinePane({
+  plateCode, subCode, asOf,
+}: {
+  plateCode: string;
+  subCode: string | null;
+  asOf: string;
+}) {
   const [opt, setOpt] = useState<EChartsCoreOption | null>(null);
   const [note, setNote] = useState("读取…");
+  const [reasons, setReasons] = useState<Record<string, unknown>[]>([]);
+  const [reasonNote, setReasonNote] = useState("读取…");
+  const [expanded, setExpanded] = useState<Record<string, string>>({});
+  const [loadingBody, setLoadingBody] = useState<Record<string, boolean>>({});
+
   useEffect(() => {
     const ctrl = new AbortController();
+    setOpt(null);
+    setNote("读取…");
+    // 一级走 open/kline/d（板指数契约）；二级走 market/kline/sub-plate。勿用 kline/plate（VIP 代理列表，题材 801 恒空）。
     const kurl = subCode
-      ? `${API}/kline/sub-plate/${subCode}?n=60`
-      : `${API}/kline/plate/${plateCode}?n=60`;
+      ? `${API}/kline/sub-plate/${encodeURIComponent(subCode)}?n=120`
+      : `${OPEN}/kline/d/${encodeURIComponent(plateCode)}?n=120`;
     fetch(kurl, { signal: ctrl.signal })
       .then((r) => r.json())
       .then((body) => {
-        const data = body?.data;
-        const xs: string[] = data?.x || data?.dates || [];
-        const ys = data?.y || data?.ohlc || [];
-        const closes = Array.isArray(ys)
-          ? ys.map((row: unknown) => (Array.isArray(row) ? num(row[1]) : num(row)))
-          : [];
-        if (!xs.length || closes.every((v) => v == null)) {
+        const { rows, meta } = normalizeKlinePayload(body?.data);
+        const usable = rows.filter((r) => r.open != null && r.close != null && r.high != null && r.low != null);
+        if (!usable.length) {
           setOpt(null);
-          setNote("K线空（缺 801 指数序列）");
+          const why = String(meta.status || meta.reason || "");
+          setNote(why.includes("unavailable") ? "K线不可用（缺公开映射/校准源）" : "暂无日线");
           return;
         }
-        setNote(`${subCode ? `二级 ${subCode}` : `一级 ${plateCode}`} · ${xs.length} 根`);
+        const closes = usable.map((r) => r.close);
+        const ma5 = maSeries(closes, 5);
+        const ma25 = maSeries(closes, 25);
+        const barVals = usable.map((r) => r.amount ?? r.volume);
+        const hasAmount = usable.some((r) => r.amount != null);
+        const last = usable[usable.length - 1]?.date || "—";
+        setNote(
+          `${subCode ? `二级 ${subCode}` : `一级 ${plateCode}`} · 日线截至 ${last}`
+          + (meta.amount_unit ? ` · 额单位 ${String(meta.amount_unit)}` : ""),
+        );
         setOpt({
           animation: false,
-          grid: { left: 8, right: 8, top: 12, bottom: 20 },
-          xAxis: { type: "category", data: xs, show: false },
-          yAxis: { type: "value", show: false, scale: true },
-          series: [{ type: "line", data: closes, showSymbol: false, lineStyle: { width: 1, color: "#999" } }],
+          tooltip: { trigger: "axis", axisPointer: { type: "cross" } },
+          legend: { data: ["日K", "MA5", "MA25", hasAmount ? "成交额" : "成交量"], top: 0, textStyle: { fontSize: 10 } },
+          axisPointer: { link: [{ xAxisIndex: "all" }] },
+          grid: [
+            { left: 48, right: 12, top: 28, height: "52%" },
+            { left: 48, right: 12, top: "72%", height: "16%" },
+          ],
+          xAxis: [
+            { type: "category", data: usable.map((r) => r.date), boundaryGap: true, axisLabel: { fontSize: 9 } },
+            { type: "category", gridIndex: 1, data: usable.map((r) => r.date), axisLabel: { show: false } },
+          ],
+          yAxis: [
+            { scale: true, splitNumber: 4, axisLabel: { fontSize: 9 } },
+            { scale: true, gridIndex: 1, splitNumber: 2, axisLabel: { show: false } },
+          ],
+          dataZoom: [
+            { type: "inside", xAxisIndex: [0, 1], start: Math.max(0, 100 - (60 / Math.max(usable.length, 1)) * 100), end: 100 },
+            { type: "slider", xAxisIndex: [0, 1], bottom: 2, height: 14, start: Math.max(0, 100 - (60 / Math.max(usable.length, 1)) * 100), end: 100 },
+          ],
+          series: [
+            {
+              name: "日K",
+              type: "candlestick",
+              data: usable.map((r) => [r.open!, r.close!, r.low!, r.high!]),
+              itemStyle: {
+                color: "#ef4444", color0: "#10b981",
+                borderColor: "#ef4444", borderColor0: "#10b981",
+              },
+            },
+            { name: "MA5", type: "line", showSymbol: false, data: ma5, lineStyle: { width: 1.2, color: "#d89d22" } },
+            { name: "MA25", type: "line", showSymbol: false, data: ma25, lineStyle: { width: 1.2, color: "#7c3aed" } },
+            {
+              name: hasAmount ? "成交额" : "成交量",
+              type: "bar",
+              xAxisIndex: 1,
+              yAxisIndex: 1,
+              data: usable.map((r, i) => {
+                const v = barVals[i];
+                if (v == null) return null;
+                const up = (r.close ?? 0) >= (r.open ?? 0);
+                return { value: v, itemStyle: { color: up ? "#ef4444" : "#10b981" } };
+              }),
+            },
+          ],
         });
       })
-      .catch((e: { name?: string }) => { if (e?.name !== "AbortError") setNote("K线失败"); });
+      .catch((e: { name?: string }) => {
+        if (e?.name !== "AbortError") setNote("K线失败");
+      });
     return () => ctrl.abort();
   }, [plateCode, subCode]);
-  if (!opt) return <p className="text-muted-foreground">{note}</p>;
+
+  useEffect(() => {
+    const ctrl = new AbortController();
+    setReasons([]);
+    setReasonNote("读取…");
+    setExpanded({});
+    fetch(
+      `${API}/plate/popular/reason?plate_code=${encodeURIComponent(plateCode)}&date1=${asOf}`,
+      { signal: ctrl.signal },
+    )
+      .then((r) => r.json())
+      .then((body) => {
+        const list = Array.isArray(body?.data) ? body.data as Record<string, unknown>[]
+          : Array.isArray(body) ? body as Record<string, unknown>[] : [];
+        const rows = list.filter((row) => {
+          const day = isoDay(row.date);
+          return /^\d{4}-\d{2}-\d{2}$/.test(day) && day <= asOf;
+        });
+        setReasons(rows);
+        setReasonNote(rows.length ? `${rows.length} 条` : "暂无相关消息");
+      })
+      .catch((e: { name?: string }) => {
+        if (e?.name !== "AbortError") setReasonNote("爆发原因加载失败");
+      });
+    return () => ctrl.abort();
+  }, [plateCode, asOf]);
+
+  const toggleReason = async (row: Record<string, unknown>) => {
+    const key = String(row.newid || row.msg_id || row.id || "");
+    if (!key) return;
+    if (expanded[key] != null) {
+      setExpanded((prev) => {
+        const next = { ...prev };
+        delete next[key];
+        return next;
+      });
+      return;
+    }
+    setLoadingBody((p) => ({ ...p, [key]: true }));
+    try {
+      const body = await fetch(
+        `${API}/plate/popular/reason/content?msgid=${encodeURIComponent(key)}`,
+      ).then((r) => r.json());
+      const p = (body?.data || {}) as Record<string, unknown>;
+      const text = String(p.Content || p.content || "—");
+      setExpanded((prev) => ({ ...prev, [key]: text }));
+    } catch {
+      setExpanded((prev) => ({ ...prev, [key]: "正文加载失败" }));
+    } finally {
+      setLoadingBody((p) => ({ ...p, [key]: false }));
+    }
+  };
+
   return (
-    <div>
-      <p className="mb-1 text-[11px] text-muted-foreground">{note}</p>
-      <EChart option={opt} height={160} />
+    <div className="space-y-3">
+      <div>
+        <p className="mb-1 text-[11px] text-muted-foreground">{note}</p>
+        {opt ? <EChart option={opt} height={280} /> : null}
+      </div>
+      <div className="rounded-md border border-border/50 bg-card/40">
+        <div className="flex items-center justify-between border-b border-border/40 px-2 py-1.5">
+          <span className="text-[12px] font-medium">板块爆发原因</span>
+          <span className="text-[10px] text-muted-foreground">{reasonNote}</span>
+        </div>
+        <div className="max-h-56 space-y-2 overflow-y-auto p-2">
+          {reasons.length === 0 ? (
+            <p className="text-[11px] text-muted-foreground">{reasonNote}</p>
+          ) : reasons.map((r, i) => {
+            const key = String(r.newid || r.msg_id || r.id || i);
+            const title = String(r.title || r.boom_reason || r.boomreason || "未命名消息");
+            const summary = String(r.boom_reason || r.boomreason || "");
+            const open = expanded[key] != null;
+            return (
+              <article key={key} className="rounded border border-border/30 px-2 py-1.5 text-[11px]">
+                <div className="flex items-baseline justify-between gap-2">
+                  <b className="truncate text-foreground/90">{title}</b>
+                  <span className="shrink-0 tabular-nums text-muted-foreground">{isoDay(r.date)}</span>
+                </div>
+                {summary && summary !== title ? (
+                  <p className="mt-0.5 line-clamp-2 text-muted-foreground">{summary}</p>
+                ) : null}
+                <button
+                  type="button"
+                  className="mt-1 text-[10px] text-primary hover:underline"
+                  onClick={() => void toggleReason(r)}
+                >
+                  {loadingBody[key] ? "正文…" : open ? "收起正文" : "查看正文"}
+                </button>
+                {open ? (
+                  <p className="mt-1 whitespace-pre-wrap text-muted-foreground">{expanded[key]}</p>
+                ) : null}
+              </article>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }
