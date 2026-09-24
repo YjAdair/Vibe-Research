@@ -59,6 +59,31 @@ export function AiDock({ send, configured, copy, renderReplyActions, renderReply
     setOpen(false);
   }, [abort]);
 
+  // 每轮都把本页内容带上：后端那条线程是进程内的，服务重启后它什么都不记得，
+  // 而用户不会知道服务重启过 —— 带着上下文问，重启前后都答得上来。
+  // 🔴 登记了页面但上下文是空串时,**要说出来**,不能发一个裸问题:
+  //    那样模型会凭自己的知识答一段看着正常的话,而用户以为它读的是这一页的数据。
+  const decorate = useCallback((q: string) => {
+    if (!page) return q;                       // 按钮本就点不动,兜底而已
+    const body = page.context
+      ? page.context
+      : "（这一页的数据还没取到 / 是空的。请如实说明看不到本页数据，不要凭一般知识作答。）";
+    return `【当前页面：${page.title}】\n${body}\n\n【问题】\n${q}`;
+  }, [page]);
+
+  // 外部「速读」等入口：打开面板并直接提交固定提示词
+  useEffect(() => {
+    const onAsk = (ev: Event) => {
+      const prompt = String((ev as CustomEvent<{ prompt?: string }>).detail?.prompt || "").trim();
+      if (!prompt || !page) return;
+      setOpen(true);
+      if (!configured) return;
+      void chat.submit(prompt, decorate);
+    };
+    window.addEventListener("vr-ai-ask", onAsk as EventListener);
+    return () => window.removeEventListener("vr-ai-ask", onAsk as EventListener);
+  }, [page, configured, chat, decorate]);
+
   // 面板开着时 Esc 关掉（弹层的基本预期）
   useEffect(() => {
     if (!open) return;
@@ -68,18 +93,6 @@ export function AiDock({ send, configured, copy, renderReplyActions, renderReply
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [open, close]);
-
-  // 每轮都把本页内容带上：后端那条线程是进程内的，服务重启后它什么都不记得，
-  // 而用户不会知道服务重启过 —— 带着上下文问，重启前后都答得上来。
-  // 🔴 登记了页面但上下文是空串时,**要说出来**,不能发一个裸问题:
-  //    那样模型会凭自己的知识答一段看着正常的话,而用户以为它读的是这一页的数据。
-  const decorate = (q: string) => {
-    if (!page) return q;                       // 按钮本就点不动,兜底而已
-    const body = page.context
-      ? page.context
-      : "（这一页的数据还没取到 / 是空的。请如实说明看不到本页数据，不要凭一般知识作答。）";
-    return `【当前页面：${page.title}】\n${body}\n\n【问题】\n${q}`;
-  };
 
   return (
     <>

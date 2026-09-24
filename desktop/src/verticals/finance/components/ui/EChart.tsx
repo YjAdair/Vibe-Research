@@ -1,13 +1,18 @@
 import { useEffect, useRef } from "react";
 import * as echarts from "echarts/core";
-import { LineChart, BarChart } from "echarts/charts";
+import { LineChart, BarChart, CandlestickChart } from "echarts/charts";
 import {
   GridComponent, TooltipComponent, LegendComponent, MarkLineComponent,
+  DataZoomComponent, AxisPointerComponent,
 } from "echarts/components";
 import { CanvasRenderer } from "echarts/renderers";
 
-// 按需注册：全量 echarts 约 1MB，这里只打包用到的折线 / 柱状与基础组件。
-echarts.use([LineChart, BarChart, GridComponent, TooltipComponent, LegendComponent, MarkLineComponent, CanvasRenderer]);
+// 按需注册：题材轮动 K 线用 candlestick + dataZoom；强度趋势用折线/柱状。
+echarts.use([
+  LineChart, BarChart, CandlestickChart,
+  GridComponent, TooltipComponent, LegendComponent, MarkLineComponent,
+  DataZoomComponent, AxisPointerComponent, CanvasRenderer,
+]);
 
 interface Props {
   option: echarts.EChartsCoreOption;

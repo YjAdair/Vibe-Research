@@ -24,14 +24,41 @@ test("转写沿用选中来源与 Agent 开关，并传递取消；不会调用�
   const originalStorage = Object.getOwnPropertyDescriptor(globalThis, "localStorage");
   Object.defineProperty(globalThis, "localStorage", { configurable: true, value: { getItem: () => JSON.stringify({ schemaVersion: 2, modePreferenceVersion: 1, source: { provider: "cli-codebuddy" }, executionMode: "agent" }) } });
   const signal = new AbortController().signal;
-  const calls: unknown[] = [];
+  const calls: string[] = [];
   globalThis.fetch = async (url, init) => {
-    calls.push(url);
-    assert.equal(url, "/api/import"); assert.equal(init?.signal, signal);
+    const path = String(url);
+    calls.push(path);
+    assert.equal(init?.signal, signal);
+    if (path.startsWith("/api/local-agents")) {
+      return new Response(JSON.stringify([{ provider: "cli-codebuddy", name: "CodeBuddy", available: true, status: "ready" }]));
+    }
+    assert.equal(path, "/api/import");
     const body = JSON.parse(String(init?.body));
     assert.equal(body.llm.provider, "cli-codebuddy"); assert.equal(body.executionMode, "agent"); assert.equal(body.kind, "position");
     return new Response(JSON.stringify({ batch: "b", kind: "position", drafts: [], warnings: [] }));
   };
-  try { await backend.importPositions([{ name: "a.csv", content_base64: "eA==" }], signal); assert.equal(calls.length, 1); }
+  try {
+    await backend.importPositions([{ name: "a.csv", content_base64: "eA==" }], signal);
+    assert.equal(calls.length, 2);
+    assert.match(calls[0]!, /\/api\/local-agents/);
+    assert.equal(calls[1], "/api/import");
+  }
   finally { globalThis.fetch = originalFetch; if (originalStorage) Object.defineProperty(globalThis, "localStorage", originalStorage); else Reflect.deleteProperty(globalThis, "localStorage"); }
+});
+
+test("普通对话模式不发起转写，并说明要开启 Agent", async () => {
+  const originalFetch = globalThis.fetch;
+  const originalStorage = Object.getOwnPropertyDescriptor(globalThis, "localStorage");
+  Object.defineProperty(globalThis, "localStorage", { configurable: true, value: { getItem: () => JSON.stringify({ schemaVersion: 2, modePreferenceVersion: 1, source: { provider: "cli-codebuddy" }, executionMode: "direct" }) } });
+  globalThis.fetch = async () => { throw new Error("不应请求"); };
+  try {
+    await assert.rejects(
+      () => backend.importPositions([{ name: "a.csv", content_base64: "eA==" }]),
+      (e: unknown) => e instanceof Error && e.message.includes("开启 Vibe Research Agent"),
+    );
+  } finally {
+    globalThis.fetch = originalFetch;
+    if (originalStorage) Object.defineProperty(globalThis, "localStorage", originalStorage);
+    else Reflect.deleteProperty(globalThis, "localStorage");
+  }
 });

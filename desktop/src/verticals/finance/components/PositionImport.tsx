@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Upload, Loader2 } from "lucide-react";
-import { backend } from "@/lib/backend";
+import { backend, friendlyAgentError } from "@/lib/backend";
 import { encodeImportFiles, positionValues, type ImportResult, type PositionValues } from "@/lib/importPositions";
 import { GlassCard } from "@/components/ui/GlassCard";
 
@@ -23,7 +23,7 @@ export function PositionImport({ onFill, existingCodes }: { onFill: (values: Pos
       const next = await backend.importPositions(encoded, ac.signal);
       if (active.current === ac && !ac.signal.aborted) setResult(next);
     } catch (e) {
-      if (active.current === ac && !ac.signal.aborted) setError(e instanceof Error ? e.message : "转写失败，请重试。");
+      if (active.current === ac && !ac.signal.aborted) setError(friendlyAgentError(e));
     } finally {
       if (active.current === ac) { active.current = null; setBusy(false); }
     }
@@ -44,7 +44,7 @@ export function PositionImport({ onFill, existingCodes }: { onFill: (values: Pos
 
   return <GlassCard className="mb-4">
     <h3 className="text-sm font-semibold">截图／表格导入</h3>
-    <p className="mt-1 text-xs text-muted-foreground">沿用已连接的 AI。文件内容会交给所选模型转写，仅生成草稿；不会自动写入或覆盖持仓。转写结束即清理本次暂存件，核对请使用原文件。</p>
+    <p className="mt-1 text-xs text-muted-foreground">使用当前已连接的模型，并需要打开 Agent。只生成草稿，不会自动写入或覆盖持仓。转写结束即清理本次暂存件，核对请使用原文件。</p>
     <div className="mt-3 flex flex-wrap items-center gap-3">
       <label className="min-w-0 flex-1 text-xs">选择截图或文本表格
         <input aria-label="选择持仓导入文件" type="file" multiple disabled={busy}

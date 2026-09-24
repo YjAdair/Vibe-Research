@@ -1,0 +1,1406 @@
+{
+ "source": "name-match + 8d pct correlation audit 2026-09-12 (corr>=0.85)",
+ "note": "EM plate_code(BKxxxx) -> THS board_code(88xxxx). Keys are EM side for O(1) lookup.",
+ "mappings": {
+  "BK0424": {
+   "ths_code": "885782",
+   "em_name": "水泥",
+   "board_type": 2,
+   "corr": 0.927,
+   "days": 9
+  },
+  "BK0422": {
+   "ths_code": "881152",
+   "em_name": "物流",
+   "board_type": 2,
+   "corr": 0.999,
+   "days": 9
+  },
+  "BK0440": {
+   "ths_code": "881139",
+   "em_name": "家居用品",
+   "board_type": 2,
+   "corr": 0.994,
+   "days": 9
+  },
+  "BK0448": {
+   "ths_code": "881129",
+   "em_name": "通信设备",
+   "board_type": 2,
+   "corr": 0.999,
+   "days": 9
+  },
+  "BK0451": {
+   "ths_code": "881153",
+   "em_name": "房地产开发",
+   "board_type": 2,
+   "corr": 0.992,
+   "days": 9
+  },
+  "BK0454": {
+   "ths_code": "881265",
+   "em_name": "塑料",
+   "board_type": 2,
+   "corr": 0.993,
+   "days": 9
+  },
+  "BK0456": {
+   "ths_code": "885543",
+   "em_name": "家用电器",
+   "board_type": 2,
+   "corr": 0.945,
+   "days": 9
+  },
+  "BK0457": {
+   "ths_code": "881278",
+   "em_name": "电网设备",
+   "board_type": 2,
+   "corr": 0.999,
+   "days": 9
+  },
+  "BK0471": {
+   "ths_code": "881264",
+   "em_name": "化学纤维",
+   "board_type": 2,
+   "corr": 0.991,
+   "days": 9
+  },
+  "BK0473": {
+   "ths_code": "881157",
+   "em_name": "证券Ⅱ",
+   "board_type": 2,
+   "corr": 1.0,
+   "days": 9
+  },
+  "BK0474": {
+   "ths_code": "881156",
+   "em_name": "保险Ⅱ",
+   "board_type": 2,
+   "corr": 1.0,
+   "days": 9
+  },
+  "BK0475": {
+   "ths_code": "881155",
+   "em_name": "银行Ⅱ",
+   "board_type": 2,
+   "corr": 1.0,
+   "days": 9
+  },
+  "BK0479": {
+   "ths_code": "881112",
+   "em_name": "钢铁",
+   "board_type": 2,
+   "corr": 0.992,
+   "days": 9
+  },
+  "BK0481": {
+   "ths_code": "881126",
+   "em_name": "汽车零部件",
+   "board_type": 2,
+   "corr": 0.999,
+   "days": 9
+  },
+  "BK0539": {
+   "ths_code": "881165",
+   "em_name": "综合Ⅱ",
+   "board_type": 2,
+   "corr": 0.991,
+   "days": 9
+  },
+  "BK0545": {
+   "ths_code": "881117",
+   "em_name": "通用设备",
+   "board_type": 2,
+   "corr": 0.996,
+   "days": 9
+  },
+  "BK0727": {
+   "ths_code": "881175",
+   "em_name": "医疗服务",
+   "board_type": 2,
+   "corr": 0.998,
+   "days": 9
+  },
+  "BK0728": {
+   "ths_code": "881284",
+   "em_name": "环保",
+   "board_type": 2,
+   "corr": 0.91,
+   "days": 9
+  },
+  "BK0731": {
+   "ths_code": "881263",
+   "em_name": "农化制品",
+   "board_type": 2,
+   "corr": 1.0,
+   "days": 9
+  },
+  "BK0732": {
+   "ths_code": "881169",
+   "em_name": "贵金属",
+   "board_type": 2,
+   "corr": 0.994,
+   "days": 9
+  },
+  "BK0735": {
+   "ths_code": "881130",
+   "em_name": "计算机设备",
+   "board_type": 2,
+   "corr": 0.996,
+   "days": 9
+  },
+  "BK0739": {
+   "ths_code": "881268",
+   "em_name": "工程机械",
+   "board_type": 2,
+   "corr": 0.999,
+   "days": 9
+  },
+  "BK0740": {
+   "ths_code": "881178",
+   "em_name": "教育",
+   "board_type": 2,
+   "corr": 0.976,
+   "days": 9
+  },
+  "BK1015": {
+   "ths_code": "881267",
+   "em_name": "能源金属",
+   "board_type": 2,
+   "corr": 0.986,
+   "days": 9
+  },
+  "BK1016": {
+   "ths_code": "881128",
+   "em_name": "汽车服务",
+   "board_type": 2,
+   "corr": 0.871,
+   "days": 9
+  },
+  "BK1018": {
+   "ths_code": "881266",
+   "em_name": "橡胶",
+   "board_type": 2,
+   "corr": 1.0,
+   "days": 9
+  },
+  "BK1019": {
+   "ths_code": "881108",
+   "em_name": "化学原料",
+   "board_type": 2,
+   "corr": 0.997,
+   "days": 9
+  },
+  "BK1020": {
+   "ths_code": "881167",
+   "em_name": "非金属材料Ⅱ",
+   "board_type": 2,
+   "corr": 0.978,
+   "days": 9
+  },
+  "BK1027": {
+   "ths_code": "881170",
+   "em_name": "小金属",
+   "board_type": 2,
+   "corr": 0.995,
+   "days": 9
+  },
+  "BK1028": {
+   "ths_code": "881146",
+   "em_name": "燃气Ⅱ",
+   "board_type": 2,
+   "corr": 0.997,
+   "days": 9
+  },
+  "BK1030": {
+   "ths_code": "881277",
+   "em_name": "电机Ⅱ",
+   "board_type": 2,
+   "corr": 0.997,
+   "days": 9
+  },
+  "BK1031": {
+   "ths_code": "881279",
+   "em_name": "光伏设备",
+   "board_type": 2,
+   "corr": 0.991,
+   "days": 9
+  },
+  "BK1032": {
+   "ths_code": "881280",
+   "em_name": "风电设备",
+   "board_type": 2,
+   "corr": 0.971,
+   "days": 9
+  },
+  "BK1033": {
+   "ths_code": "881281",
+   "em_name": "电池",
+   "board_type": 2,
+   "corr": 0.999,
+   "days": 9
+  },
+  "BK1034": {
+   "ths_code": "881282",
+   "em_name": "其他电源设备Ⅱ",
+   "board_type": 2,
+   "corr": 0.993,
+   "days": 9
+  },
+  "BK1035": {
+   "ths_code": "881182",
+   "em_name": "美容护理",
+   "board_type": 2,
+   "corr": 0.999,
+   "days": 9
+  },
+  "BK1036": {
+   "ths_code": "881121",
+   "em_name": "半导体",
+   "board_type": 2,
+   "corr": 1.0,
+   "days": 9
+  },
+  "BK1037": {
+   "ths_code": "881124",
+   "em_name": "消费电子",
+   "board_type": 2,
+   "corr": 0.997,
+   "days": 9
+  },
+  "BK1038": {
+   "ths_code": "881122",
+   "em_name": "光学光电子",
+   "board_type": 2,
+   "corr": 0.996,
+   "days": 9
+  },
+  "BK1044": {
+   "ths_code": "881142",
+   "em_name": "生物制品",
+   "board_type": 2,
+   "corr": 0.997,
+   "days": 9
+  },
+  "BK1046": {
+   "ths_code": "881275",
+   "em_name": "游戏Ⅱ",
+   "board_type": 2,
+   "corr": 0.998,
+   "days": 9
+  },
+  "BK1208": {
+   "ths_code": "881115",
+   "em_name": "建筑材料",
+   "board_type": 2,
+   "corr": 0.989,
+   "days": 9
+  },
+  "BK1209": {
+   "ths_code": "881116",
+   "em_name": "建筑装饰",
+   "board_type": 2,
+   "corr": 0.998,
+   "days": 9
+  },
+  "BK1214": {
+   "ths_code": "881179",
+   "em_name": "社会服务",
+   "board_type": 2,
+   "corr": 0.956,
+   "days": 9
+  },
+  "BK1215": {
+   "ths_code": "881129",
+   "em_name": "通信",
+   "board_type": 2,
+   "corr": 0.984,
+   "days": 9
+  },
+  "BK1217": {
+   "ths_code": "881165",
+   "em_name": "综合",
+   "board_type": 2,
+   "corr": 0.991,
+   "days": 9
+  },
+  "BK1224": {
+   "ths_code": "881135",
+   "em_name": "纺织制造",
+   "board_type": 2,
+   "corr": 0.999,
+   "days": 9
+  },
+  "BK1225": {
+   "ths_code": "881136",
+   "em_name": "服装家纺",
+   "board_type": 2,
+   "corr": 0.982,
+   "days": 9
+  },
+  "BK1227": {
+   "ths_code": "885428",
+   "em_name": "特钢Ⅱ",
+   "board_type": 2,
+   "corr": 0.914,
+   "days": 9
+  },
+  "BK1233": {
+   "ths_code": "881276",
+   "em_name": "军工电子Ⅱ",
+   "board_type": 2,
+   "corr": 0.994,
+   "days": 9
+  },
+  "BK1234": {
+   "ths_code": "881284",
+   "em_name": "环保设备Ⅱ",
+   "board_type": 2,
+   "corr": 0.912,
+   "days": 9
+  },
+  "BK1235": {
+   "ths_code": "881181",
+   "em_name": "环境治理",
+   "board_type": 2,
+   "corr": 0.994,
+   "days": 9
+  },
+  "BK1240": {
+   "ths_code": "881174",
+   "em_name": "厨卫电器",
+   "board_type": 2,
+   "corr": 1.0,
+   "days": 9
+  },
+  "BK1241": {
+   "ths_code": "881132",
+   "em_name": "黑色家电",
+   "board_type": 2,
+   "corr": 1.0,
+   "days": 9
+  },
+  "BK1244": {
+   "ths_code": "881173",
+   "em_name": "小家电",
+   "board_type": 2,
+   "corr": 0.998,
+   "days": 9
+  },
+  "BK1250": {
+   "ths_code": "881105",
+   "em_name": "煤炭开采",
+   "board_type": 2,
+   "corr": 0.975,
+   "days": 9
+  },
+  "BK1255": {
+   "ths_code": "881101",
+   "em_name": "林业Ⅱ",
+   "board_type": 2,
+   "corr": 0.914,
+   "days": 9
+  },
+  "BK1261": {
+   "ths_code": "881101",
+   "em_name": "种植业",
+   "board_type": 2,
+   "corr": 0.995,
+   "days": 9
+  },
+  "BK1276": {
+   "ths_code": "881107",
+   "em_name": "油气开采Ⅱ",
+   "board_type": 2,
+   "corr": 0.969,
+   "days": 9
+  },
+  "BK1279": {
+   "ths_code": "881273",
+   "em_name": "非白酒",
+   "board_type": 2,
+   "corr": 0.925,
+   "days": 9
+  },
+  "BK1280": {
+   "ths_code": "881134",
+   "em_name": "食品加工",
+   "board_type": 2,
+   "corr": 0.995,
+   "days": 9
+  },
+  "BK1283": {
+   "ths_code": "881155",
+   "em_name": "银行",
+   "board_type": 2,
+   "corr": 1.0,
+   "days": 9
+  },
+  "BK0470": {
+   "ths_code": "881137",
+   "em_name": "造纸印刷",
+   "board_type": 3,
+   "corr": 0.926,
+   "days": 9
+  },
+  "BK1301": {
+   "ths_code": "881275",
+   "em_name": "游戏Ⅲ",
+   "board_type": 2,
+   "corr": 0.998,
+   "days": 9
+  },
+  "BK1307": {
+   "ths_code": "881277",
+   "em_name": "电机Ⅲ",
+   "board_type": 2,
+   "corr": 0.997,
+   "days": 9
+  },
+  "BK0501": {
+   "ths_code": "885598",
+   "em_name": "次新股",
+   "board_type": 3,
+   "corr": 0.996,
+   "days": 9
+  },
+  "BK0505": {
+   "ths_code": "885741",
+   "em_name": "中字头",
+   "board_type": 3,
+   "corr": 0.994,
+   "days": 9
+  },
+  "BK0506": {
+   "ths_code": "885413",
+   "em_name": "创投",
+   "board_type": 3,
+   "corr": 0.99,
+   "days": 9
+  },
+  "BK0509": {
+   "ths_code": "885603",
+   "em_name": "网络游戏",
+   "board_type": 3,
+   "corr": 0.998,
+   "days": 9
+  },
+  "BK0514": {
+   "ths_code": "885620",
+   "em_name": "参股券商",
+   "board_type": 3,
+   "corr": 0.993,
+   "days": 9
+  },
+  "BK0523": {
+   "ths_code": "881114",
+   "em_name": "新材料",
+   "board_type": 3,
+   "corr": 0.888,
+   "days": 9
+  },
+  "BK0525": {
+   "ths_code": "885835",
+   "em_name": "参股银行",
+   "board_type": 3,
+   "corr": 0.995,
+   "days": 9
+  },
+  "BK0547": {
+   "ths_code": "885530",
+   "em_name": "黄金概念",
+   "board_type": 3,
+   "corr": 0.999,
+   "days": 9
+  },
+  "BK0548": {
+   "ths_code": "885845",
+   "em_name": "生物疫苗",
+   "board_type": 3,
+   "corr": 0.987,
+   "days": 9
+  },
+  "BK0554": {
+   "ths_code": "885312",
+   "em_name": "物联网",
+   "board_type": 3,
+   "corr": 0.995,
+   "days": 9
+  },
+  "BK1326": {
+   "ths_code": "881121",
+   "em_name": "半导体设备",
+   "board_type": 2,
+   "corr": 0.97,
+   "days": 9
+  },
+  "BK0574": {
+   "ths_code": "885710",
+   "em_name": "锂电池概念",
+   "board_type": 3,
+   "corr": 0.998,
+   "days": 9
+  },
+  "BK0577": {
+   "ths_code": "885571",
+   "em_name": "核能核电",
+   "board_type": 3,
+   "corr": 0.991,
+   "days": 9
+  },
+  "BK0578": {
+   "ths_code": "885343",
+   "em_name": "稀土永磁",
+   "board_type": 3,
+   "corr": 0.981,
+   "days": 9
+  },
+  "BK0579": {
+   "ths_code": "885362",
+   "em_name": "云计算",
+   "board_type": 3,
+   "corr": 0.992,
+   "days": 9
+  },
+  "BK1332": {
+   "ths_code": "881172",
+   "em_name": "电子化学品Ⅲ",
+   "board_type": 2,
+   "corr": 0.998,
+   "days": 9
+  },
+  "BK0580": {
+   "ths_code": "885738",
+   "em_name": "LED概念",
+   "board_type": 3,
+   "corr": 0.89,
+   "days": 9
+  },
+  "BK1336": {
+   "ths_code": "881123",
+   "em_name": "其他电子Ⅲ",
+   "board_type": 2,
+   "corr": 0.999,
+   "days": 9
+  },
+  "BK1338": {
+   "ths_code": "881124",
+   "em_name": "消费电子零部件及组装",
+   "board_type": 2,
+   "corr": 0.996,
+   "days": 9
+  },
+  "BK1339": {
+   "ths_code": "881270",
+   "em_name": "被动元件",
+   "board_type": 2,
+   "corr": 0.966,
+   "days": 9
+  },
+  "BK0596": {
+   "ths_code": "885338",
+   "em_name": "融资融券",
+   "board_type": 3,
+   "corr": 1.0,
+   "days": 9
+  },
+  "BK0597": {
+   "ths_code": "885572",
+   "em_name": "水利建设",
+   "board_type": 3,
+   "corr": 0.979,
+   "days": 9
+  },
+  "BK0601": {
+   "ths_code": "885426",
+   "em_name": "海工装备",
+   "board_type": 3,
+   "corr": 0.911,
+   "days": 9
+  },
+  "BK0603": {
+   "ths_code": "885372",
+   "em_name": "页岩气",
+   "board_type": 3,
+   "corr": 0.995,
+   "days": 9
+  },
+  "BK0604": {
+   "ths_code": "885623",
+   "em_name": "参股保险",
+   "board_type": 3,
+   "corr": 0.986,
+   "days": 9
+  },
+  "BK1343": {
+   "ths_code": "885915",
+   "em_name": "物业管理",
+   "board_type": 2,
+   "corr": 0.892,
+   "days": 9
+  },
+  "BK0617": {
+   "ths_code": "885355",
+   "em_name": "石墨烯",
+   "board_type": 3,
+   "corr": 0.975,
+   "days": 9
+  },
+  "BK0619": {
+   "ths_code": "885537",
+   "em_name": "3D打印",
+   "board_type": 3,
+   "corr": 0.973,
+   "days": 9
+  },
+  "BK0628": {
+   "ths_code": "885378",
+   "em_name": "智慧城市",
+   "board_type": 3,
+   "corr": 0.989,
+   "days": 9
+  },
+  "BK0632": {
+   "ths_code": "885439",
+   "em_name": "土地流转",
+   "board_type": 3,
+   "corr": 0.995,
+   "days": 9
+  },
+  "BK0637": {
+   "ths_code": "885456",
+   "em_name": "互联网金融",
+   "board_type": 3,
+   "corr": 0.937,
+   "days": 9
+  },
+  "BK0653": {
+   "ths_code": "885522",
+   "em_name": "养老概念",
+   "board_type": 3,
+   "corr": 0.996,
+   "days": 9
+  },
+  "BK0655": {
+   "ths_code": "885459",
+   "em_name": "网络安全",
+   "board_type": 3,
+   "corr": 0.986,
+   "days": 9
+  },
+  "BK1358": {
+   "ths_code": "881156",
+   "em_name": "保险Ⅲ",
+   "board_type": 2,
+   "corr": 1.0,
+   "days": 9
+  },
+  "BK1361": {
+   "ths_code": "885570",
+   "em_name": "期货",
+   "board_type": 2,
+   "corr": 0.972,
+   "days": 9
+  },
+  "BK1363": {
+   "ths_code": "885814",
+   "em_name": "信托",
+   "board_type": 2,
+   "corr": 0.91,
+   "days": 9
+  },
+  "BK0667": {
+   "ths_code": "885423",
+   "em_name": "安防概念",
+   "board_type": 3,
+   "corr": 0.958,
+   "days": 9
+  },
+  "BK1370": {
+   "ths_code": "885428",
+   "em_name": "特钢Ⅲ",
+   "board_type": 2,
+   "corr": 0.914,
+   "days": 9
+  },
+  "BK0669": {
+   "ths_code": "885505",
+   "em_name": "生态农业",
+   "board_type": 3,
+   "corr": 0.991,
+   "days": 9
+  },
+  "BK0683": {
+   "ths_code": "886021",
+   "em_name": "央国企改革",
+   "board_type": 3,
+   "corr": 1.0,
+   "days": 9
+  },
+  "BK1381": {
+   "ths_code": "881146",
+   "em_name": "燃气Ⅲ",
+   "board_type": 2,
+   "corr": 0.997,
+   "days": 9
+  },
+  "BK0684": {
+   "ths_code": "885514",
+   "em_name": "京津冀",
+   "board_type": 3,
+   "corr": 0.954,
+   "days": 9
+  },
+  "BK0685": {
+   "ths_code": "885587",
+   "em_name": "举牌",
+   "board_type": 3,
+   "corr": 0.929,
+   "days": 9
+  },
+  "BK0689": {
+   "ths_code": "885611",
+   "em_name": "阿里概念",
+   "board_type": 3,
+   "corr": 0.99,
+   "days": 9
+  },
+  "BK0690": {
+   "ths_code": "885551",
+   "em_name": "氟化工概念",
+   "board_type": 3,
+   "corr": 0.989,
+   "days": 9
+  },
+  "BK0692": {
+   "ths_code": "885497",
+   "em_name": "旅游概念",
+   "board_type": 3,
+   "corr": 0.982,
+   "days": 9
+  },
+  "BK1386": {
+   "ths_code": "881276",
+   "em_name": "军工电子Ⅲ",
+   "board_type": 2,
+   "corr": 0.994,
+   "days": 9
+  },
+  "BK0693": {
+   "ths_code": "885578",
+   "em_name": "基因测序",
+   "board_type": 3,
+   "corr": 0.987,
+   "days": 9
+  },
+  "BK1387": {
+   "ths_code": "881284",
+   "em_name": "环保设备Ⅲ",
+   "board_type": 2,
+   "corr": 0.912,
+   "days": 9
+  },
+  "BK0695": {
+   "ths_code": "885552",
+   "em_name": "小金属概念",
+   "board_type": 3,
+   "corr": 0.981,
+   "days": 9
+  },
+  "BK0698": {
+   "ths_code": "885769",
+   "em_name": "免疫治疗",
+   "board_type": 3,
+   "corr": 0.979,
+   "days": 9
+  },
+  "BK1392": {
+   "ths_code": "881268",
+   "em_name": "工程机械器件",
+   "board_type": 2,
+   "corr": 0.89,
+   "days": 9
+  },
+  "BK0700": {
+   "ths_code": "885461",
+   "em_name": "充电桩",
+   "board_type": 3,
+   "corr": 0.984,
+   "days": 9
+  },
+  "BK1393": {
+   "ths_code": "881268",
+   "em_name": "工程机械整机",
+   "board_type": 2,
+   "corr": 0.932,
+   "days": 9
+  },
+  "BK0703": {
+   "ths_code": "885886",
+   "em_name": "超级电容",
+   "board_type": 3,
+   "corr": 0.984,
+   "days": 9
+  },
+  "BK1398": {
+   "ths_code": "881117",
+   "em_name": "其他通用设备",
+   "board_type": 2,
+   "corr": 0.952,
+   "days": 9
+  },
+  "BK0710": {
+   "ths_code": "885730",
+   "em_name": "量子科技",
+   "board_type": 3,
+   "corr": 0.911,
+   "days": 9
+  },
+  "BK1405": {
+   "ths_code": "881118",
+   "em_name": "其他专用设备",
+   "board_type": 2,
+   "corr": 0.912,
+   "days": 9
+  },
+  "BK0712": {
+   "ths_code": "885494",
+   "em_name": "一带一路",
+   "board_type": 3,
+   "corr": 0.972,
+   "days": 9
+  },
+  "BK0714": {
+   "ths_code": "885556",
+   "em_name": "5G概念",
+   "board_type": 3,
+   "corr": 0.993,
+   "days": 9
+  },
+  "BK1408": {
+   "ths_code": "885517",
+   "em_name": "机器人",
+   "board_type": 2,
+   "corr": 0.972,
+   "days": 9
+  },
+  "BK1410": {
+   "ths_code": "881171",
+   "em_name": "其他自动化设备",
+   "board_type": 2,
+   "corr": 0.996,
+   "days": 9
+  },
+  "BK1411": {
+   "ths_code": "881167",
+   "em_name": "非金属材料Ⅲ",
+   "board_type": 2,
+   "corr": 0.978,
+   "days": 9
+  },
+  "BK1420": {
+   "ths_code": "881108",
+   "em_name": "其他化学原料",
+   "board_type": 2,
+   "corr": 0.946,
+   "days": 9
+  },
+  "BK1421": {
+   "ths_code": "885652",
+   "em_name": "钛白粉",
+   "board_type": 2,
+   "corr": 0.883,
+   "days": 9
+  },
+  "BK1431": {
+   "ths_code": "885912",
+   "em_name": "有机硅",
+   "board_type": 2,
+   "corr": 0.931,
+   "days": 9
+  },
+  "BK0805": {
+   "ths_code": "885652",
+   "em_name": "钛白粉概念",
+   "board_type": 3,
+   "corr": 0.988,
+   "days": 9
+  },
+  "BK1435": {
+   "ths_code": "885863",
+   "em_name": "磷肥及磷化工",
+   "board_type": 2,
+   "corr": 0.903,
+   "days": 9
+  },
+  "BK0808": {
+   "ths_code": "885743",
+   "em_name": "军民融合",
+   "board_type": 3,
+   "corr": 0.976,
+   "days": 9
+  },
+  "BK0818": {
+   "ths_code": "885748",
+   "em_name": "可燃冰",
+   "board_type": 3,
+   "corr": 0.974,
+   "days": 9
+  },
+  "BK0822": {
+   "ths_code": "885758",
+   "em_name": "租售同权",
+   "board_type": 3,
+   "corr": 0.991,
+   "days": 9
+  },
+  "BK1444": {
+   "ths_code": "881271",
+   "em_name": "IT服务Ⅲ",
+   "board_type": 2,
+   "corr": 0.999,
+   "days": 9
+  },
+  "BK1445": {
+   "ths_code": "885423",
+   "em_name": "安防设备",
+   "board_type": 2,
+   "corr": 0.898,
+   "days": 9
+  },
+  "BK1446": {
+   "ths_code": "881130",
+   "em_name": "其他计算机设备",
+   "board_type": 2,
+   "corr": 0.978,
+   "days": 9
+  },
+  "BK0830": {
+   "ths_code": "885757",
+   "em_name": "区块链",
+   "board_type": 3,
+   "corr": 0.997,
+   "days": 9
+  },
+  "BK0832": {
+   "ths_code": "885783",
+   "em_name": "工业互联网",
+   "board_type": 3,
+   "corr": 0.994,
+   "days": 9
+  },
+  "BK0839": {
+   "ths_code": "885791",
+   "em_name": "知识产权",
+   "board_type": 3,
+   "corr": 0.967,
+   "days": 9
+  },
+  "BK0852": {
+   "ths_code": "885502",
+   "em_name": "冷链物流",
+   "board_type": 3,
+   "corr": 0.994,
+   "days": 9
+  },
+  "BK0853": {
+   "ths_code": "885737",
+   "em_name": "电子竞技",
+   "board_type": 3,
+   "corr": 0.99,
+   "days": 9
+  },
+  "BK0854": {
+   "ths_code": "885806",
+   "em_name": "华为概念",
+   "board_type": 3,
+   "corr": 0.996,
+   "days": 9
+  },
+  "BK1481": {
+   "ths_code": "881148",
+   "em_name": "港口",
+   "board_type": 2,
+   "corr": 0.897,
+   "days": 9
+  },
+  "BK1482": {
+   "ths_code": "881148",
+   "em_name": "航运",
+   "board_type": 2,
+   "corr": 0.978,
+   "days": 9
+  },
+  "BK1488": {
+   "ths_code": "881152",
+   "em_name": "跨境物流",
+   "board_type": 2,
+   "corr": 0.942,
+   "days": 9
+  },
+  "BK1502": {
+   "ths_code": "881101",
+   "em_name": "林业Ⅲ",
+   "board_type": 2,
+   "corr": 0.914,
+   "days": 9
+  },
+  "BK1505": {
+   "ths_code": "881103",
+   "em_name": "其他农产品加工",
+   "board_type": 2,
+   "corr": 0.945,
+   "days": 9
+  },
+  "BK1534": {
+   "ths_code": "881138",
+   "em_name": "印刷",
+   "board_type": 2,
+   "corr": 0.861,
+   "days": 9
+  },
+  "BK1540": {
+   "ths_code": "881139",
+   "em_name": "其他家居用品",
+   "board_type": 2,
+   "corr": 0.971,
+   "days": 9
+  },
+  "BK1550": {
+   "ths_code": "881159",
+   "em_name": "贸易Ⅲ",
+   "board_type": 2,
+   "corr": 0.985,
+   "days": 9
+  },
+  "BK1557": {
+   "ths_code": "881178",
+   "em_name": "培训教育",
+   "board_type": 2,
+   "corr": 0.952,
+   "days": 9
+  },
+  "BK1560": {
+   "ths_code": "881160",
+   "em_name": "酒店",
+   "board_type": 2,
+   "corr": 0.939,
+   "days": 9
+  },
+  "BK1574": {
+   "ths_code": "881107",
+   "em_name": "油气开采Ⅲ",
+   "board_type": 2,
+   "corr": 0.969,
+   "days": 9
+  },
+  "BK1575": {
+   "ths_code": "881273",
+   "em_name": "白酒Ⅲ",
+   "board_type": 2,
+   "corr": 1.0,
+   "days": 9
+  },
+  "BK1577": {
+   "ths_code": "885780",
+   "em_name": "啤酒",
+   "board_type": 2,
+   "corr": 0.908,
+   "days": 9
+  },
+  "BK1596": {
+   "ths_code": "881142",
+   "em_name": "其他生物制品",
+   "board_type": 2,
+   "corr": 0.992,
+   "days": 9
+  },
+  "BK1598": {
+   "ths_code": "885845",
+   "em_name": "疫苗",
+   "board_type": 2,
+   "corr": 0.961,
+   "days": 9
+  },
+  "BK1608": {
+   "ths_code": "881141",
+   "em_name": "中药Ⅲ",
+   "board_type": 2,
+   "corr": 1.0,
+   "days": 9
+  },
+  "BK1610": {
+   "ths_code": "881155",
+   "em_name": "股份制银行Ⅲ",
+   "board_type": 2,
+   "corr": 0.972,
+   "days": 9
+  },
+  "BK1624": {
+   "ths_code": "881170",
+   "em_name": "其他小金属",
+   "board_type": 2,
+   "corr": 0.942,
+   "days": 9
+  },
+  "BK1626": {
+   "ths_code": "885343",
+   "em_name": "稀土",
+   "board_type": 2,
+   "corr": 0.898,
+   "days": 9
+  },
+  "BK1627": {
+   "ths_code": "881165",
+   "em_name": "综合Ⅲ",
+   "board_type": 2,
+   "corr": 0.991,
+   "days": 9
+  },
+  "BK0428": {
+   "ths_code": "881145",
+   "em_name": "电力",
+   "board_type": 2,
+   "corr": 0.998,
+   "days": 9
+  },
+  "BK0437": {
+   "ths_code": "881105",
+   "em_name": "煤炭",
+   "board_type": 2,
+   "corr": 0.999,
+   "days": 9
+  },
+  "BK0459": {
+   "ths_code": "881270",
+   "em_name": "元件",
+   "board_type": 2,
+   "corr": 0.999,
+   "days": 9
+  },
+  "BK0482": {
+   "ths_code": "881158",
+   "em_name": "一般零售",
+   "board_type": 2,
+   "corr": 0.998,
+   "days": 9
+  },
+  "BK0484": {
+   "ths_code": "881159",
+   "em_name": "贸易Ⅱ",
+   "board_type": 2,
+   "corr": 0.985,
+   "days": 9
+  },
+  "BK0486": {
+   "ths_code": "881164",
+   "em_name": "传媒",
+   "board_type": 2,
+   "corr": 0.996,
+   "days": 9
+  },
+  "BK0538": {
+   "ths_code": "881109",
+   "em_name": "化学制品",
+   "board_type": 2,
+   "corr": 0.999,
+   "days": 9
+  },
+  "BK0736": {
+   "ths_code": "881162",
+   "em_name": "通信服务",
+   "board_type": 2,
+   "corr": 0.989,
+   "days": 9
+  },
+  "BK0737": {
+   "ths_code": "881272",
+   "em_name": "软件开发",
+   "board_type": 2,
+   "corr": 1.0,
+   "days": 9
+  },
+  "BK0738": {
+   "ths_code": "881283",
+   "em_name": "多元金融",
+   "board_type": 2,
+   "corr": 1.0,
+   "days": 9
+  },
+  "BK0910": {
+   "ths_code": "881118",
+   "em_name": "专用设备",
+   "board_type": 2,
+   "corr": 0.998,
+   "days": 9
+  },
+  "BK1040": {
+   "ths_code": "881141",
+   "em_name": "中药Ⅱ",
+   "board_type": 2,
+   "corr": 1.0,
+   "days": 9
+  },
+  "BK1041": {
+   "ths_code": "881144",
+   "em_name": "医疗器械",
+   "board_type": 2,
+   "corr": 1.0,
+   "days": 9
+  },
+  "BK1042": {
+   "ths_code": "881143",
+   "em_name": "医药商业",
+   "board_type": 2,
+   "corr": 0.997,
+   "days": 9
+  },
+  "BK1202": {
+   "ths_code": "881153",
+   "em_name": "房地产",
+   "board_type": 2,
+   "corr": 0.999,
+   "days": 9
+  },
+  "BK1213": {
+   "ths_code": "881158",
+   "em_name": "商贸零售",
+   "board_type": 2,
+   "corr": 0.994,
+   "days": 9
+  },
+  "BK1236": {
+   "ths_code": "881269",
+   "em_name": "轨交设备Ⅱ",
+   "board_type": 2,
+   "corr": 0.978,
+   "days": 9
+  },
+  "BK1237": {
+   "ths_code": "881171",
+   "em_name": "自动化设备",
+   "board_type": 2,
+   "corr": 0.996,
+   "days": 9
+  },
+  "BK1238": {
+   "ths_code": "881271",
+   "em_name": "IT服务Ⅱ",
+   "board_type": 2,
+   "corr": 0.999,
+   "days": 9
+  },
+  "BK1256": {
+   "ths_code": "881103",
+   "em_name": "农产品加工",
+   "board_type": 2,
+   "corr": 0.946,
+   "days": 9
+  },
+  "BK1259": {
+   "ths_code": "881102",
+   "em_name": "养殖业",
+   "board_type": 2,
+   "corr": 0.985,
+   "days": 9
+  },
+  "BK1265": {
+   "ths_code": "881138",
+   "em_name": "包装印刷",
+   "board_type": 2,
+   "corr": 0.996,
+   "days": 9
+  },
+  "BK1268": {
+   "ths_code": "881177",
+   "em_name": "互联网电商",
+   "board_type": 2,
+   "corr": 0.994,
+   "days": 9
+  },
+  "BK1277": {
+   "ths_code": "881273",
+   "em_name": "白酒Ⅱ",
+   "board_type": 2,
+   "corr": 1.0,
+   "days": 9
+  },
+  "BK1287": {
+   "ths_code": "881168",
+   "em_name": "工业金属",
+   "board_type": 2,
+   "corr": 0.999,
+   "days": 9
+  },
+  "BK1302": {
+   "ths_code": "881281",
+   "em_name": "电池化学品",
+   "board_type": 2,
+   "corr": 0.915,
+   "days": 9
+  },
+  "BK1303": {
+   "ths_code": "881281",
+   "em_name": "锂电池",
+   "board_type": 2,
+   "corr": 0.955,
+   "days": 9
+  },
+  "BK1322": {
+   "ths_code": "881282",
+   "em_name": "其他电源设备Ⅲ",
+   "board_type": 2,
+   "corr": 0.988,
+   "days": 9
+  },
+  "BK1325": {
+   "ths_code": "881121",
+   "em_name": "半导体材料",
+   "board_type": 2,
+   "corr": 0.984,
+   "days": 9
+  },
+  "BK1353": {
+   "ths_code": "881136",
+   "em_name": "家纺",
+   "board_type": 2,
+   "corr": 0.899,
+   "days": 9
+  },
+  "BK1394": {
+   "ths_code": "881269",
+   "em_name": "轨交设备Ⅲ",
+   "board_type": 2,
+   "corr": 0.978,
+   "days": 9
+  },
+  "BK1428": {
+   "ths_code": "881109",
+   "em_name": "其他化学制品",
+   "board_type": 2,
+   "corr": 0.959,
+   "days": 9
+  },
+  "BK1440": {
+   "ths_code": "881265",
+   "em_name": "其他塑料制品",
+   "board_type": 2,
+   "corr": 0.919,
+   "days": 9
+  },
+  "BK1480": {
+   "ths_code": "881151",
+   "em_name": "机场",
+   "board_type": 2,
+   "corr": 0.986,
+   "days": 9
+  },
+  "BK1486": {
+   "ths_code": "881152",
+   "em_name": "仓储物流",
+   "board_type": 2,
+   "corr": 0.923,
+   "days": 9
+  }
+ }
+}

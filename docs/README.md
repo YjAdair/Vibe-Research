@@ -1,5 +1,6 @@
 # docs
 
+- **模块文档（独立目录）**：[theme-rotation/](theme-rotation/README.md) — 热点题材轮动 PRD / API / 数据架构 / 开发经验（本期收口，迁入后权威文档）。
 - [source-delivery.md](source-delivery.md) — v1.2.0 源码交付：基于公开 v1.1.0 暂撤 Mac 客户端，保留源码与浏览器工作台。
 - [issue-pr-triage-v1.2.0.md](issue-pr-triage-v1.2.0.md) — 2 个 Issue、6 个 PR 的处理范围、采纳与暂缓理由。
 - 带日期的里程碑文档是历史记录，尤其 M32–M40 的客户端和安装验收不再代表当前交付范围；旧工具见公开 v1.1.0 标签。

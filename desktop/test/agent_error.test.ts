@@ -156,6 +156,17 @@ test("不支持的 cli provider 交给后端判定，不误报成未登录", asy
   }
 });
 
+test("持仓转写的文件和草稿错误不能说成 AI 没连接", () => {
+  const cases = [
+    ["a.csv 声称是文本,内容却不是合法 UTF-8", "content_mismatch"],
+    ["请求体过大", "body_too_large"],
+    ["模型没有给出可用的核对草稿。请重试，或换一份更清晰的截图；表格请另存为 UTF-8 的 CSV。", "ingest_turn_failed"],
+  ] as const;
+  for (const [message, code] of cases) {
+    assert.equal(friendlyAgentError(new ApiError(message, 400, code)), message);
+  }
+});
+
 test("连接探针「有响应但没回填令牌」是可行动错误，原样显示而不是当成连接失败（#40）", () => {
   const raw = new ApiError("模型已响应，但没有按探针格式回填本次令牌。请确认所选模型能遵循结构化输出要求后重试", 400, "probe_bad_output");
   assert.equal(friendlyAgentError(raw), raw.message);

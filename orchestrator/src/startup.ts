@@ -150,6 +150,7 @@ export function createShutdownMonitor(
   api: ChildProcess,
   ui: ChildProcess,
   signalSource: NodeJS.Process = process,
+  market?: ChildProcess,
 ): ShutdownMonitor {
   let settled = false;
   let resolveOutcome: (outcome: ShutdownOutcome) => void = () => {};
@@ -167,14 +168,16 @@ export function createShutdownMonitor(
   const exited = (label: string, code: number | null, signal: NodeJS.Signals | null) => {
     finish({
       kind: "child_exit",
-      message: `${label}已停止（${code === null ? `信号 ${signal ?? "未知"}` : `退出码 ${code}`}），另一进程将同步关闭。`,
+      message: `${label}已停止（${code === null ? `信号 ${signal ?? "未知"}` : `退出码 ${code}`}），其余进程将同步关闭。`,
     });
   };
   const apiExit = (code: number | null, signal: NodeJS.Signals | null) => exited("本机 API", code, signal);
   const uiExit = (code: number | null, signal: NodeJS.Signals | null) => exited("浏览器界面", code, signal);
+  const marketExit = (code: number | null, signal: NodeJS.Signals | null) => exited("题材行情", code, signal);
   for (const [signal, handler] of signalHandlers) signalSource.once(signal, handler);
   api.once("exit", apiExit);
   ui.once("exit", uiExit);
+  market?.once("exit", marketExit);
 
   return {
     wait,
@@ -182,6 +185,7 @@ export function createShutdownMonitor(
       for (const [signal, handler] of signalHandlers) signalSource.removeListener(signal, handler);
       api.removeListener("exit", apiExit);
       ui.removeListener("exit", uiExit);
+      market?.removeListener("exit", marketExit);
     },
   };
 }
@@ -201,8 +205,27 @@ export async function runStartup(
   if (missing.length > 0) throw new Error(`还没有完成安装（缺少:${missing.join("、")}）。请先运行 scripts/setup。`);
   await assertPortAvailable(8765);
   await assertPortAvailable(5930);
+  await assertPortAvailable(8766);
+
+  const marketPy = process.platform === "win32"
+    ? path.join(repoRoot, "market-api", ".venv", "Scripts", "python.exe")
+    : path.join(repoRoot, "market-api", ".venv", "bin", "python");
+  if (!fs.existsSync(marketPy)) {
+    throw new Error("未找到题材行情服务解释器（market-api/.venv）。请先安装 market-api 依赖。");
+  }
+  if (!fs.existsSync(path.join(repoRoot, "market-api", "zzquant.db"))) {
+    throw new Error("未找到题材行情库 market-api/zzquant.db。");
+  }
 
   const detached = true;
+  const marketEnv = {
+    ...env,
+    ZZQUANT_ENABLE_ORIGIN_REFERENCE: env.ZZQUANT_ENABLE_ORIGIN_REFERENCE ?? "1",
+    ZZQUANT_COLLECTOR_MODE: env.ZZQUANT_COLLECTOR_MODE ?? "external",
+  };
+  const market = spawn(marketPy, ["-m", "uvicorn", "app.main:app", "--host", "127.0.0.1", "--port", "8766"], {
+    cwd: path.join(repoRoot, "market-api"), env: marketEnv, detached, stdio: "inherit",
+  });
   const api = spawn(process.execPath, ["orchestrator/src/api.ts", "--port", "8765", "--host", "127.0.0.1"], {
     cwd: repoRoot, env, detached, stdio: "inherit",
   });
@@ -212,22 +235,27 @@ export async function runStartup(
   });
   let apiLaunchError: Error | null = null;
   let uiLaunchError: Error | null = null;
+  let marketLaunchError: Error | null = null;
   api.once("error", (error) => { apiLaunchError = error; });
   ui.once("error", (error) => { uiLaunchError = error; });
-  const shutdown = createShutdownMonitor(api, ui);
+  market.once("error", (error) => { marketLaunchError = error; });
+  const shutdown = createShutdownMonitor(api, ui, process, market);
 
   try {
     const startupOutcome = await Promise.race([
       waitUntilReady({
-        failure: () => childFailure("本机 API", api, apiLaunchError) ?? childFailure("浏览器界面", ui, uiLaunchError),
+        failure: () => childFailure("题材行情", market, marketLaunchError)
+          ?? childFailure("本机 API", api, apiLaunchError)
+          ?? childFailure("浏览器界面", ui, uiLaunchError),
         probe: async () => {
           const token = apiToken(repoRoot, env);
           if (!token) return false;
-          const [apiOk, uiOk] = await Promise.all([
+          const [apiOk, uiOk, marketOk] = await Promise.all([
             reachable("http://127.0.0.1:8765/health", { Authorization: `Bearer ${token}` }),
             reachable("http://127.0.0.1:5930"),
+            reachable("http://127.0.0.1:8766/health"),
           ]);
-          return apiOk && uiOk;
+          return apiOk && uiOk && marketOk;
         },
       }).then(() => ({ kind: "ready" as const })),
       shutdown.wait,
@@ -244,6 +272,7 @@ export async function runStartup(
     shutdown.dispose();
     stopChild(ui);
     stopChild(api);
+    stopChild(market);
   }
 }
 

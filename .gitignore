@@ -9,6 +9,12 @@ __pycache__/
 .coverage
 htmlcov/
 
+# 题材行情本地库与运行物（体积大，本机专用）
+market-api/zzquant.db
+market-api/zzquant.db-*
+market-api/uploads/
+market-api/.venv/
+
 # Node
 node_modules/
 dist/

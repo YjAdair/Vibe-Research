@@ -7,7 +7,14 @@ test("V2 保留原侧栏顺序、子栏目及真实 AI 入口", () => {
   const layout = read("verticals/finance/components/layout/Layout.tsx");
   const nav = layout.slice(layout.indexOf("const NAV ="), layout.indexOf("const INTEL_LINKS"));
   assert.deepEqual([...nav.matchAll(/label: "([^"]+)"/g)].map(m => m[1]), ["首页", "每日复盘", "资讯雷达", "产业信号", "板块中心", "个股研究", "多空辩论", "回测", "自选股", "我的持仓", "我的研报", "研究记录", "接入 AI"]);
-  for (const route of ["/intel/investment-news", "/intel/news", "/intel/filings", "/intel/events", "/signals/gpu-rent", "/sectors/humanoid", "/sectors/ai-computing"]) assert.ok(layout.includes(route));
+  for (const route of ["/intel/hot", "/intel/investment-news", "/intel/news", "/intel/filings", "/intel/events", "/signals/gpu-rent", "/sectors/humanoid", "/sectors/ai-computing"]) assert.ok(layout.includes(route));
+  const intel = layout.slice(layout.indexOf("const INTEL_LINKS"), layout.indexOf("const SIGNAL_LINKS"));
+  assert.equal([...intel.matchAll(/label: "([^"]+)"/g)][0]?.[1], "热点");
+  const hot = read("verticals/finance/lib/hotModules.ts");
+  assert.deepEqual([...hot.matchAll(/label: "([^"]+)"/g)].map(m => m[1]), ["题材轮动", "题材表格", "我的题材", "每日盘前(AI)", "每日盘后(AI)"]);
+  const rotation = read("verticals/finance/pages/ThemeRotation.tsx");
+  assert.match(rotation, /testId="amount-trend"/);
+  assert.doesNotMatch(rotation, /\{showMoney &&/);
   assert.doesNotMatch(layout, /FinanceAiConsole|consoleOpen|vr-ai-console|openAgent|打开普通对话/);
   assert.match(layout, /href="https:\/\/phoenixtree\.ai\/"/);
   for (const label of ["联系作者", "GitHub", "收起侧栏"]) assert.ok(layout.includes(label));

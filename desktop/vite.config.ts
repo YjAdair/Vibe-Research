@@ -86,6 +86,22 @@ export default defineConfig({
           });
         },
       },
+      // 题材轮动：同源 /v3 → 本机 market-api（由 scripts/start 托管），浏览器不直连 8766。
+      "/v3": {
+        target: "http://127.0.0.1:8766",
+        changeOrigin: false,
+        configure(proxy) {
+          proxy.on("error", (err, _req, res) => {
+            const msg = /ECONNREFUSED/.test(String(err))
+              ? "题材行情服务未启动。请用 scripts/start 统一启动。"
+              : `题材行情代理失败:${err.message}`;
+            if ("writeHead" in res && !res.headersSent) {
+              res.writeHead(502, { "Content-Type": "application/json; charset=utf-8" });
+              res.end(JSON.stringify({ error: "market_unreachable", message: msg }));
+            }
+          });
+        },
+      },
     },
   },
 });

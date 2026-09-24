@@ -31,11 +31,17 @@ export interface ArchiveThenRefresh<T> {
 
 const msg = (e: unknown): string => (e instanceof Error ? e.message : String(e));
 
+// ponytail: 进程内缓存。切栏目不打上游；满 5 分钟或点「刷新」才再取。刷新页面会丢。
+const MEMORY_MS = 5 * 60 * 1000;
+const memory = new Map<string, { at: number; deps: string; data: unknown }>();
+
 export function useArchiveThenRefresh<T>(
   /** `load(false)` = 读存档；`load(true)` = 真取一次 */
   load: (refresh: boolean) => Promise<T>,
   /** 这些变了就重来一遍（比如换了查询对象、换了栏目） */
   deps: readonly unknown[] = [],
+  /** 同一 key 在有效期内直接用上次结果，不发请求 */
+  cacheKey?: string,
 ): ArchiveThenRefresh<T> {
   const [data, setData] = useState<T | null>(null);
   const [err, setErr] = useState<string | null>(null);
@@ -46,6 +52,16 @@ export function useArchiveThenRefresh<T>(
   // load 通常是行内箭头函数，每次渲染都是新的 —— 放进依赖会无限重来
   const loadRef = useRef(load);
   loadRef.current = load;
+  const cacheKeyRef = useRef(cacheKey);
+  cacheKeyRef.current = cacheKey;
+  const depsKey = JSON.stringify(deps);
+  const depsKeyRef = useRef(depsKey);
+  depsKeyRef.current = depsKey;
+
+  const remember = (data: T) => {
+    const key = cacheKeyRef.current;
+    if (key) memory.set(key, { at: Date.now(), deps: depsKeyRef.current, data });
+  };
   // 卸载 / 换 deps 之后到达的结果一律丢弃：否则会写进已经不属于它的那一屏
   const runRef = useRef(0);
   /**
@@ -65,6 +81,7 @@ export function useArchiveThenRefresh<T>(
       const fresh = await loadRef.current(true);
       if (runRef.current !== run) return;
       setData(fresh);
+      remember(fresh);
       setErr(null);
       setStaleNote(null);
     } catch (e) {
@@ -86,6 +103,16 @@ export function useArchiveThenRefresh<T>(
   }, []);
 
   useEffect(() => {
+    const key = cacheKeyRef.current;
+    const hit = key ? memory.get(key) : undefined;
+    if (hit && hit.deps === depsKeyRef.current && Date.now() - hit.at < MEMORY_MS) {
+      setData(hit.data as T);
+      setErr(null);
+      setStaleNote(null);
+      setLoading(false);
+      setRefreshing(false);
+      return;
+    }
     const run = ++runRef.current;
     setLoading(true);
     setErr(null);

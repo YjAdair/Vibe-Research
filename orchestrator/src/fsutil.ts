@@ -7,19 +7,20 @@ import path from "node:path";
 /** O_NOFOLLOW 在 Windows 不受支持；Windows 路径由 safePath/lstat 的逐级链接检查保护。 */
 export const NOFOLLOW_FLAG = process.platform === "win32" ? 0 : fs.constants.O_NOFOLLOW;
 
+// Get-Acl includes the SACL. Set-Acl then demands SeSecurityPrivilege, which a normal user does not have.
 const WINDOWS_PRIVATE_ACL = String.raw`
 $ErrorActionPreference = "Stop"
 $file = $env:VRA_PRIVATE_FILE
 $sid = [System.Security.Principal.WindowsIdentity]::GetCurrent().User
-$acl = Get-Acl -LiteralPath $file
+$item = Get-Item -LiteralPath $file
+$acl = $item.GetAccessControl([System.Security.AccessControl.AccessControlSections]::Access)
 $acl.SetAccessRuleProtection($true, $false)
 foreach ($existing in @($acl.Access)) {
   [void]$acl.RemoveAccessRuleSpecific($existing)
 }
 $rule = New-Object System.Security.AccessControl.FileSystemAccessRule($sid, [System.Security.AccessControl.FileSystemRights]::FullControl, [System.Security.AccessControl.AccessControlType]::Allow)
 $acl.AddAccessRule($rule)
-$acl.SetOwner($sid)
-Set-Acl -LiteralPath $file -AclObject $acl
+$item.SetAccessControl($acl)
 `;
 
 const WINDOWS_CHECK_ACL = String.raw`
@@ -49,14 +50,15 @@ function windowsAcl(script: string, file: string): { status: number | null; erro
   const result = spawnSync("powershell.exe", ["-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-Command", script], {
     env: windowsAclEnv(file), encoding: "utf8", windowsHide: true, timeout: 10_000,
   });
-  return { status: result.status, error: result.error };
+  return { status: result.status, error: result.error, stderr: typeof result.stderr === "string" ? result.stderr.trim() : "" };
 }
 
 /** Windows 的 mode 0600 不会改变 NTFS DACL；敏感文件必须显式断开继承并只授权当前 SID。 */
 export function restrictPrivateFile(file: string): void {
   if (process.platform !== "win32") { fs.chmodSync(file, 0o600); return; }
   const result = windowsAcl(WINDOWS_PRIVATE_ACL, file);
-  if (result.error || result.status !== 0) throw new Error(`无法收紧 Windows 文件权限(${result.error?.message ?? `exit ${result.status}`})`);
+  const detail = result.error?.message ?? (result.stderr || `exit ${result.status}`);
+  if (result.error || result.status !== 0) throw new Error(`无法收紧 Windows 文件权限(${detail})`);
 }
 
 /** Request-path ACL setup must not block unrelated API requests on Windows. */

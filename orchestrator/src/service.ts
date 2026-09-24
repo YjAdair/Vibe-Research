@@ -1650,8 +1650,15 @@ export async function ingestFiles(ctx: ServiceContext, req: { kind: string; file
   try {
     return await ingestFilesCore({ repoRoot: ctx.repoRoot, dataRoot: ctx.dataRoot, python: ctx.python, signal, ...(llm ? { llm } : {}) }, req);
   } catch (e) {
-    if (e instanceof IngestError) throw new ServiceError(e.code, e.message);
-    throw e;
+    if (e instanceof IngestError) {
+      if (e.code === "turn_failed" || e.code === "bad_output") {
+        throw new ServiceError("ingest_turn_failed", "模型没有给出可用的核对草稿。请重试，或换一份更清晰的截图；表格请另存为 UTF-8 的 CSV。");
+      }
+      throw new ServiceError(e.code, e.message);
+    }
+    if (e instanceof ChatError) throw new ServiceError(e.code, e.message);
+    console.error(`[import] ${redact(e instanceof Error ? e.message : String(e), 300)}`);
+    throw new ServiceError("ingest_turn_failed", "资料转写没有完成。请确认 Agent 已开启后重试。");
   }
 }
 
